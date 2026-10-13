@@ -1,0 +1,31 @@
+ibc_2024:
+  habitable_space:
+    min_area_sqm: 6.503      # 70 sq ft (IBC 1207.1)
+    min_dimension_m: 2.134    # 7 ft (IBC 1207.2)
+    max_aspect_ratio: 2.5     # Practical architectural recommendation
+  corridor:
+    min_width_residential_m: 0.914  # 36 inches (IBC 1020.2)
+    min_width_commercial_m: 1.118   # 44 inches (IBC 1020.2)
+  glazing_ventilation:
+    min_window_to_floor_ratio: 0.08 # 8% of room floor area (IBC 1204.2 / 1205.2)
+  egress:
+    max_travel_distance_single_exit_m: 22.86 # 75 ft for un-sprinklered R-2 (IBC 1017.2)
+    max_travel_distance_sprinklered_m: 38.10 # 125 ft (IBC 1017.2)
+    max_dead_end_corridor_m: 6.096 # 20 ft (IBC 1020.4)
+
+ada_2010:
+  doorways:
+    min_clear_opening_m: 0.813 # 32 inches clear (ADA 404.2.3)
+  accessible_routes:
+    min_hallway_width_m: 0.914 # 36 inches continuous (ADA 403.5.1)
+  turning_space:
+    min_turning_circle_diameter_m: 1.524 # 60 inches diameter (ADA 304.3.1) in bathrooms & kitchens
+
+zoning_standard:
+  setbacks:
+    min_front_m: 1.5
+    min_rear_m: 1.5
+    min_side_m: 1.0
+  coverage:
+    max_ground_coverage_ratio: 0.75
+    max_far: 2.0

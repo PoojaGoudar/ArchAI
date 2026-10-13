@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArchAI Pro — AI Architectural Floor Plan & Statutory Compliance Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <!-- Three.js and OrbitControls for Interactive 3D BIM Model Visualizer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body class="theme-cad-dark">
+
+  <!-- Top Ribbon Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-badge">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">ArchAI <span class="badge-pro">PRO</span></span>
+          <span class="brand-tagline">Autonomous Compliance-Aware Architectural Studio</span>
+        </div>
+      </div>
+
+      <div class="project-selector">
+        <span class="project-label">Project:</span>
+        <input type="text" id="projectTitleInput" class="project-title-input" value="Aura Residences — Unit 304" />
+      </div>
+    </div>
+
+    <!-- Center View Mode Switcher -->
+    <div class="header-center">
+      <div class="view-switch-tabs">
+        <button class="view-tab active" id="viewTab2D" onclick="setViewMode('2d')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          2D Blueprint CAD
+        </button>
+        <button class="view-tab" id="viewTab3D" onclick="setViewMode('3d')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          3D Axonometric
+        </button>
+        <button class="view-tab" id="viewTabSchedule" onclick="setViewMode('schedule')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Area Schedule
+        </button>
+        <button class="view-tab" id="viewTabAudit" onclick="setViewMode('audit')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          Statutory Audit
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Actions & Units -->
+    <div class="header-right">
+      <div class="unit-toggle" onclick="toggleUnitSystem()">
+        <span id="unitMetric" class="unit-opt active">METRIC (m)</span>
+        <span id="unitImperial" class="unit-opt">IMPERIAL (ft)</span>
+      </div>
+
+      <div class="compliance-status-pill" id="headerCompliancePill">
+        <span class="status-indicator"></span>
+        <span id="headerComplianceText">100.0% COMPLIANT</span>
+      </div>
+
+      <div class="dropdown">
+        <button class="btn btn-export" onclick="toggleExportMenu()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export & Deliver
+        </button>
+        <div class="dropdown-menu" id="exportDropdown">
+          <a class="dropdown-item" onclick="exportDXF()"><span class="item-icon">📐</span> AutoCAD (.DXF) Vector CAD</a>
+          <a class="dropdown-item" onclick="exportSVG()"><span class="item-icon">🖼️</span> High-Res Vector Blueprint (.SVG)</a>
+          <a class="dropdown-item" onclick="exportReportMD()"><span class="item-icon">📜</span> Statutory Compliance Certificate (.MD)</a>
+          <a class="dropdown-item" onclick="exportBIMJSON()"><span class="item-icon">💾</span> Full BIM Spatial Data (.JSON)</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" onclick="window.print()"><span class="item-icon">🖨️</span> Print Blueprint Sheet</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Workspace Container -->
+  <main class="studio-layout">
+    
+    <!-- Left Panel: AI Project Studio & Program Builder -->
+    <aside class="studio-sidebar-left">
+      <div class="panel-section">
+        <div class="section-header">
+          <h3>AI Architectural Co-Pilot</h3>
+          <span class="chip-mini">Agentic NLP</span>
+        </div>
+
+        <div class="field-box">
+          <label>Architectural Brief / Design Intent</label>
+          <textarea id="briefText" rows="3" placeholder="Describe layout (e.g., Luxury 3 BHK residence with master ensuite, open kitchen, and home office)"></textarea>
+        </div>
+
+        <div class="typology-pills">
+          <span class="typology-label">Presets:</span>
+          <button class="pill-chip" onclick="applyTypology('1bhk')">1 BHK Studio</button>
+          <button class="pill-chip" onclick="applyTypology('2bhk')">2 BHK Modern</button>
+          <button class="pill-chip active" onclick="applyTypology('3bhk')">3 BHK Luxury</button>
+          <button class="pill-chip" onclick="applyTypology('4bhk')">4 BHK Villa</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-header">
+          <h3>Site & Plot Parameters</h3>
+          <span class="chip-mini">Zoning Constraints</span>
+        </div>
+
+        <div class="input-row-2">
+          <div class="field-box">
+            <label>Plot Width (W)</label>
+            <div class="input-with-unit">
+              <input type="number" id="plotWidth" value="16.0" step="0.5" min="10" max="40" onchange="recalculatePlotArea()" />
+              <span class="unit-addon">m</span>
+            </div>
+          </div>
+          <div class="field-box">
+            <label>Plot Depth (D)</label>
+            <div class="input-with-unit">
+              <input type="number" id="plotDepth" value="14.0" step="0.5" min="10" max="40" onchange="recalculatePlotArea()" />
+              <span class="unit-addon">m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-row-2">
+          <div class="field-box">
+            <label>Front Setback</label>
+            <div class="input-with-unit">
+              <input type="number" id="setbackFront" value="1.5" step="0.1" min="0.5" />
+              <span class="unit-addon">m</span>
+            </div>
+          </div>
+          <div class="field-box">
+            <label>Rear Setback</label>
+            <div class="input-with-unit">
+              <input type="number" id="setbackRear" value="1.5" step="0.1" min="0.5" />
+              <span class="unit-addon">m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-row-2">
+          <div class="field-box">
+            <label>Side Setback (L/R)</label>
+            <div class="input-with-unit">
+              <input type="number" id="setbackSide" value="1.0" step="0.1" min="0.5" />
+              <span class="unit-addon">m</span>
+            </div>
+          </div>
+          <div class="field-box">
+            <label>Building Standard</label>
+            <select id="buildingStandardSelect">
+              <option value="IBC2024" selected>IBC 2024 & ADA</option>
+              <option value="NBC2016">NBC 2016 (India)</option>
+              <option value="EURO">Eurocode EN 1990</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn btn-generate-primary" id="btnSynthesize" onclick="executeGeneration()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Synthesize Compliant Floor Plan
+      </button>
+
+      <!-- Multi-Agent Reasoning Execution Stream -->
+      <div class="agent-stream-panel">
+        <div class="stream-header">
+          <span>Agent Deliberation Stream</span>
+          <span class="agent-count-badge">5 Agents Active</span>
+        </div>
+        <div class="stream-steps" id="agentStreamSteps">
+          <div class="empty-stream-msg">Click 'Synthesize Compliant Floor Plan' to run the multi-agent design & audit loop.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center Stage: Multi-Modal Architectural Canvas -->
+    <section class="studio-center-stage">
+
+      <!-- CAD Toolbar Controls -->
+      <div class="cad-ribbon">
+        <div class="ribbon-group">
+          <button class="tool-btn" onclick="zoomIn()" title="Zoom In">+</button>
+          <button class="tool-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+          <button class="tool-btn" onclick="fitCanvas()" title="Fit to Screen">⟲ Fit</button>
+        </div>
+
+        <div class="ribbon-divider"></div>
+
+        <div class="ribbon-group">
+          <label class="layer-toggle">
+            <input type="checkbox" id="chkEgress" checked onchange="toggleCanvasLayer('egress')" />
+            <span>Egress Exit Paths</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="chkGlazing" checked onchange="toggleCanvasLayer('glazing')" />
+            <span>Daylight Glazing</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="chkFurniture" checked onchange="toggleCanvasLayer('furniture')" />
+            <span>Furniture Icons</span>
+          </label>
+          <label class="layer-toggle">
+            <input type="checkbox" id="chkDims" checked onchange="toggleCanvasLayer('dims')" />
+            <span>Dimensions</span>
+          </label>
+        </div>
+
+        <div class="ribbon-divider"></div>
+
+        <div class="ribbon-group">
+          <select id="themeSelect" onchange="changeCADTheme(this.value)" class="theme-selector">
+            <option value="cad-dark" selected>CAD Dark Theme</option>
+            <option value="blueprint">Classic Blueprint Blue</option>
+            <option value="light">Drafting White Sheet</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 2D Canvas Container -->
+      <div class="stage-view-wrapper active" id="stage2D">
+        <div class="canvas-viewport" id="canvasViewport">
+          <div id="svgCanvasMount" class="svg-mount"></div>
+        </div>
+      </div>
+
+      <!-- 3D WebGL Canvas Container -->
+      <div class="stage-view-wrapper" id="stage3D">
+        <div id="threejsMount" class="three-mount"></div>
+        <div class="three-controls-overlay">
+          <span>Orbit: Left Click + Drag | Pan: Right Click + Drag | Zoom: Scroll</span>
+          <button class="btn btn-sm btn-secondary" onclick="reset3DCamera()">Reset 3D Camera</button>
+        </div>
+      </div>
+
+      <!-- Area Schedule / Room Program View -->
+      <div class="stage-view-wrapper" id="stageSchedule">
+        <div class="schedule-view-card">
+          <div class="schedule-header">
+            <h2>Architectural Space Program & Area Takeoff</h2>
+            <button class="btn btn-secondary btn-sm" onclick="exportScheduleCSV()">Export Schedule (.CSV)</button>
+          </div>
+          <table class="schedule-table" id="scheduleTable">
+            <thead>
+              <tr>
+                <th>Room Name</th>
+                <th>Typology Zone</th>
+                <th>Target Area</th>
+                <th>Actual Area</th>
+                <th>Dimensions (W × D)</th>
+                <th>Aspect Ratio</th>
+                <th>Windows / Glazing</th>
+                <th>ADA Accessibility</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Statutory Audit View -->
+      <div class="stage-view-wrapper" id="stageAudit">
+        <div class="audit-view-card">
+          <div class="audit-card-top">
+            <div>
+              <h2>Statutory Building Code Verification Certificate</h2>
+              <p class="audit-sub">Official verification against IBC 2024, ADA 2010, and Municipal Zoning Bylaws.</p>
+            </div>
+            <button class="btn btn-primary" onclick="exportReportMD()">Download Official Certificate (.MD)</button>
+          </div>
+          <div class="audit-certificate-body" id="auditCertBody"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Studio KPI Dashboard -->
+      <div class="studio-bottom-metrics">
+        <div class="metric-block">
+          <span class="m-label">STATUTORY COMPLIANCE</span>
+          <span class="m-val text-emerald" id="kpiCompliance">100.0%</span>
+          <span class="m-hint">IBC 2024 & ADA Verified</span>
+        </div>
+        <div class="metric-block">
+          <span class="m-label">TOTAL BUILT FOOTPRINT</span>
+          <span class="m-val" id="kpiArea">148.5 m²</span>
+          <span class="m-hint" id="kpiCoverageTxt">Coverage: 66.3% of plot</span>
+        </div>
+        <div class="metric-block">
+          <span class="m-label">MEAN EGRESS DISTANCE</span>
+          <span class="m-val text-cyan" id="kpiEgressDistance">11.4 m</span>
+          <span class="m-hint">Limit: 22.86 m (75 ft)</span>
+        </div>
+        <div class="metric-block">
+          <span class="m-label">SPATIAL COLLISION RATE</span>
+          <span class="m-val text-emerald">0.00%</span>
+          <span class="m-hint">Exact Non-Overlapping Bounds</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Panel: Live Inspector & Compliance Audit Matrix -->
+    <aside class="studio-sidebar-right">
+      <div class="sidebar-tabs">
+        <button class="side-tab active" id="tabRules" onclick="switchSideTab('rules')">Compliance Matrix</button>
+        <button class="side-tab" id="tabProperties" onclick="switchSideTab('properties')">Room Inspector</button>
+      </div>
+
+      <!-- Tab 1: Live Compliance Matrix -->
+      <div class="side-tab-content active" id="sideTabRulesContent">
+        <div class="audit-stat-card">
+          <div class="stat-pill">
+            <span class="stat-num text-emerald" id="statPassCount">28</span>
+            <span class="stat-txt">Passed</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-num text-rose" id="statFailCount">0</span>
+            <span class="stat-txt">Critical</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-num text-amber" id="statWarnCount">0</span>
+            <span class="stat-txt">Warnings</span>
+          </div>
+        </div>
+
+        <div class="code-category-group">
+          <span class="cat-title">IBC 2024 CHAPTER 12 — INTERIOR SPACES</span>
+          <div class="rule-card pass" onclick="highlightRuleRooms('area')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">IBC §1207.1: Minimum Habitable Area</span>
+              <span class="r-desc">All habitable spaces ≥ 6.50 m² (70 sq.ft)</span>
+            </div>
+          </div>
+          <div class="rule-card pass" onclick="highlightRuleRooms('dim')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">IBC §1207.2: Minimum Dimension Width</span>
+              <span class="r-desc">Narrowest room wall ≥ 2.13 m (7.0 ft)</span>
+            </div>
+          </div>
+          <div class="rule-card pass" onclick="highlightRuleRooms('glazing')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">IBC §1205.2: Natural Light & Glazing</span>
+              <span class="r-desc">Window glazing area ≥ 8% of room area</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-category-group">
+          <span class="cat-title">IBC 2024 CHAPTER 10 — MEANS OF EGRESS</span>
+          <div class="rule-card pass" onclick="highlightRuleRooms('egress')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">IBC §1017.2: Exit Travel Distance</span>
+              <span class="r-desc">Shortest escape path &lt; 22.86 m (75 ft)</span>
+            </div>
+          </div>
+          <div class="rule-card pass" onclick="highlightRuleRooms('corridor')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">IBC §1020.2: Minimum Corridor Clear</span>
+              <span class="r-desc">Central circulation spine ≥ 0.914 m (36 in)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-category-group">
+          <span class="cat-title">ADA 2010 ACCESSIBILITY STANDARDS</span>
+          <div class="rule-card pass" onclick="highlightRuleRooms('doors')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">ADA §404.2.3: Doorway Clear Openings</span>
+              <span class="r-desc">All interior doors ≥ 813 mm (32 in) clear</span>
+            </div>
+          </div>
+          <div class="rule-card pass" onclick="highlightRuleRooms('turning')">
+            <div class="rule-badge">✓</div>
+            <div class="rule-info">
+              <span class="r-title">ADA §304.3.1: Wheelchair Turning Circle</span>
+              <span class="r-desc">60-inch (1.524 m) diameter circular clearance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Room Properties Inspector -->
+      <div class="side-tab-content" id="sideTabPropertiesContent">
+        <div id="noRoomSelectedMsg" class="empty-room-msg">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          <span>Select any room on the 2D blueprint to inspect its geometric parameters and statutory ratings.</span>
+        </div>
+
+        <div id="roomInspectorDetails" class="room-details-box hidden">
+          <div class="room-title-box">
+            <h4 id="inspRoomName">Master Bedroom</h4>
+            <span class="badge-zone" id="inspRoomZone">Private Zone</span>
+          </div>
+
+          <div class="prop-table">
+            <div class="prop-row">
+              <span>Floor Area</span>
+              <strong id="inspRoomArea">18.4 m² (198.0 sq.ft)</strong>
+            </div>
+            <div class="prop-row">
+              <span>Dimensions (W × D)</span>
+              <strong id="inspRoomDims">4.80m × 3.83m</strong>
+            </div>
+            <div class="prop-row">
+              <span>Aspect Ratio</span>
+              <strong id="inspRoomAspect">1.25 : 1 (Ideal)</strong>
+            </div>
+            <div class="prop-row">
+              <span>Daylight Glazing</span>
+              <strong id="inspRoomGlazing">1.80 m² (9.8% of floor)</strong>
+            </div>
+            <div class="prop-row">
+              <span>Doors & Clearances</span>
+              <strong id="inspRoomDoors">1 Door (900mm ADA Pass)</strong>
+            </div>
+            <div class="prop-row">
+              <span>Egress Travel Dist</span>
+              <strong id="inspRoomEgress" class="text-emerald">9.2 m (Compliant)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
